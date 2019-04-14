@@ -12,7 +12,7 @@ def fetch(url):
     return feed
 
 
-def find_regressions(entries, since: datetime.date, cutoff=1.15):
+def find_regressions(entries, since: datetime.date):
     keep = []
     for entry in entries:
         entry_date = datetime.date(*entry['updated_parsed'][:3])
