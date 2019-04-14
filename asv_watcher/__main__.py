@@ -72,8 +72,11 @@ async def main(request):
         parser.feed(text)
         projects = parser.projects
         today = datetime.date.today()
-        regression_handler = lambda project: handle_regressions(gh=gh, since=today)
-        await asyncio.gather(map(regression_handler, projects))
+        futures = [
+            handle_regressions(project, gh, since=today)
+            for project in projects
+        ]
+        await asyncio.gather(futures)
 
     return web.Response(status=200)
 
