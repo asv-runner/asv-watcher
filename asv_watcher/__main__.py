@@ -3,7 +3,6 @@ import datetime
 import html.parser
 import os
 import re
-import urllib.parse
 
 import aiohttp
 import feedparser
