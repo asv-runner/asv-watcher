@@ -1,0 +1,20 @@
+[build-system]
+requires = ["flit"]
+build-backend = "flit.buildapi"
+
+[tool.flit.metadata]
+module = "asv_watcher"
+author = "Tom Augspurger"
+author-email = "tom.w.augspurger@gmail.com"
+home-page = "https://github.com/TomAugspurger/asv-watcher"
+
+requires = [
+    "requests >=2.6",
+    "feedparser >=5.2.1",
+]
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest >=4.4.0",
+    "pytest-cov",
+]
