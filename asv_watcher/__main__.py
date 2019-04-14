@@ -71,7 +71,8 @@ async def main(request):
         parser = ProjectParser()
         parser.feed(text)
         projects = parser.projects
-        today = datetime.date.today()
+        # today = datetime.date.today()
+        today = datetime.date(2019, 4, 4)
         futures = [
             handle_regressions(project, gh, since=today)
             for project in projects
