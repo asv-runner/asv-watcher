@@ -16,7 +16,7 @@ from gidgethub import aiohttp as gh_aiohttp
 PYDATA_WEBSERVER_IP = "104.130.226.93"
 PYDATA_WEBSERVER_USERNAME = "asv-watcher"
 GH_ORG_WHITELIST = {
-    "pandas-dev"
+    # "pandas-dev"
 }
 
 xpr = re.compile(
@@ -115,6 +115,7 @@ async def handle_regressions(project, gh: gh_aiohttp.GitHubAPI, since: datetime.
             keep.append(entry)
 
     for regression in keep:
+        # TODO: Only open one issue per commit. A single commit may cause multiple regressions
         match = xpr.match(regression['summary'])
         if match:
             groups = match.groupdict()
