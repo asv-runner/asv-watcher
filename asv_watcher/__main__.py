@@ -76,7 +76,7 @@ async def main(request):
             handle_regressions(project, gh, since=today)
             for project in projects
         ]
-        await asyncio.gather(futures)
+        await asyncio.gather(*futures)
 
     return web.Response(status=200)
 
