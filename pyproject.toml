@@ -11,6 +11,8 @@ home-page = "https://github.com/TomAugspurger/asv-watcher"
 requires = [
     "requests >=2.6",
     "feedparser >=5.2.1",
+    "aiohttp",
+    "gidgethub",
 ]
 
 [tool.flit.metadata.requires-extra]
