@@ -1,1 +1,1 @@
-web: python3 asv_watcher/webservice/__main__.py
+web: python3 -m asv_watcher
