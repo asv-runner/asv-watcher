@@ -117,20 +117,44 @@ async def handle_regressions(project, gh: gh_aiohttp.GitHubAPI, since: datetime.
         match = xpr.match(regression['summary'])
         if match:
             groups = match.groupdict()
+            org = groups['GH_ORG']
+            repo = groups['GH_REPO']
+            sha = groups['SHA']
+
             if match['GH_ORG'] in GH_ORG_WHITELIST:
-                body = 'Possible performance regression in commit {SHA}'.format(SHA=match['SHA'][:6])
+                commit = await gh.getitem(f'/repos/{org}/{repo}/commits/{sha}')
+                data = format_issue(regression, commit)
                 await gh.post(
-                    '/repos/{GH_ORG}/{GH_REPO}/issues'.format(**groups),
-                    data={
-                        'title': "Performance regression in {SHA}".format(**groups),
-                        'body': body
-                    }
+                    f'/repos/{org}/{repo}/issues',
+                    data=data
                 )
+                print(f"reported {sha}")
             else:
                 print("Not reporting for", groups)
 
         else:
             print("Missing match for", regression)
+
+
+def format_issue(regression, commit):
+    title = "Possible performance regression in {sha}"
+    template = """
+    Possible performance regression in {html_url}.
+
+    Regression: {regression_url}
+    Benchmark: {benchmark}
+
+    cc @{author}."""
+    data = {
+        'title': title.format(sha=commit['sha'][:6]),
+        'body': template.format(
+            html_url=commit['html_url'],
+            author=commit['author']['login'],
+            regression_url=regression['link'],
+            benchmark=regression['title'],
+        ),
+    }
+    return data
 
 
 if __name__ == "__main__":
