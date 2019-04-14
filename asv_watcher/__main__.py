@@ -1,10 +1,14 @@
 import os
 
 import aiohttp
+import paramiko
 from aiohttp import web
 from gidgethub import routing, sansio
 from gidgethub import aiohttp as gh_aiohttp
 
+
+PYDATA_WEBSERVER_IP = "104.130.226.93"
+PYDATA_WEBSERVER_USERNAME = "asv-watcher"
 
 router = routing.Router()
 
@@ -16,6 +20,23 @@ async def issued_open_event(event, gh, *args, **kwargs):
 
     message = f"Thanks for the report @{author}! I will look into it ASAP! (I'm a bot)."
     await gh.post(url, data={"body": message})
+
+
+@router.register("push")
+async def on_commit(event, gh, *args, **kwargs):
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy)
+    password = os.environ['PYDATA_WEBSERVER_PASSWORD']
+    client.connect(PYDATA_WEBSERVER_IP,
+                   username=PYDATA_WEBSERVER_USERNAME,
+                   password=password)
+
+    command = (
+        'git -C /usr/share/nginx/asv-collection/ fetch origin '
+        '&& git -C /usr/share/nginx/asv-collection/ reset --hard origin/master'
+    )
+    stdin, stdout, stderr = client.exec_command(command)
+    print(stdout.read().decode())
 
 
 async def main(request):
