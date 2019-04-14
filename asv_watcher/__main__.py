@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import html.parser
+import textwrap
 import os
 import re
 
@@ -138,13 +139,13 @@ async def handle_regressions(project, gh: gh_aiohttp.GitHubAPI, since: datetime.
 
 def format_issue(regression, commit):
     title = "Possible performance regression in {sha}"
-    template = """
+    template = textwrap.dedent("""
     Possible performance regression in {html_url}.
 
     Regression: {regression_url}
     Benchmark: {benchmark}
 
-    cc @{author}."""
+    cc @{author}.""")
     data = {
         'title': title.format(sha=commit['sha'][:6]),
         'body': template.format(
