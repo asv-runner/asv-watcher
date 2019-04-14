@@ -106,7 +106,6 @@ async def handle_regressions(project, gh: gh_aiohttp.GitHubAPI, since: datetime.
     entries = feed['entries']
 
     keep = []
-    matches = []
 
     for entry in entries:
         # TODO: Find how to only *fetch* new entries since `since`, rather than filter
@@ -115,24 +114,23 @@ async def handle_regressions(project, gh: gh_aiohttp.GitHubAPI, since: datetime.
             keep.append(entry)
 
     for regression in keep:
-        match = re.match(regression['summary'])
+        match = xpr.match(regression['summary'])
         if match:
-            matches.append(match.groupdict())
+            groups = match.groupdict()
+            if match['GH_ORG'] in GH_ORG_WHITELIST:
+                body = 'Possible performance regression in commit {SHA}'.format(SHA=match['SHA'][:6])
+                await gh.post(
+                    '/repos/{GH_ORG}/{GH_REPO}/issues'.format(**groups),
+                    data={
+                        'title': "Performance regression in {SHA}".format(**groups),
+                        'body': body
+                    }
+                )
+            else:
+                print("Not reporting for", groups)
+
         else:
             print("Missing match for", regression)
-
-    for match in matches:
-        if match['GH_ORG'] in GH_ORG_WHITELIST:
-            body = 'Possible performance regression in commit {SHA}'.format(SHA=match['SHA'][:6])
-            await gh.post(
-                '/repos/{GH_ORG}/{GH_REPO}/issues'.format(**match),
-                data={
-                    'title': "Performance regression in {SHA}".format(**match),
-                    'body': body
-                }
-            )
-        else:
-            print("Not reporting for", match)
 
 
 if __name__ == "__main__":
