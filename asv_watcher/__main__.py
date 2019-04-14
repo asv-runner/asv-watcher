@@ -15,7 +15,7 @@ from gidgethub import aiohttp as gh_aiohttp
 PYDATA_WEBSERVER_IP = "104.130.226.93"
 PYDATA_WEBSERVER_USERNAME = "asv-watcher"
 GH_ORG_WHITELIST = {
-    "pandas"
+    "pandas-dev"
 }
 
 xpr = re.compile(
@@ -72,7 +72,7 @@ async def main(request):
         parser.feed(text)
         projects = parser.projects
         # today = datetime.date.today()
-        today = datetime.date(2019, 4, 4)
+        today = datetime.date(2019, 4, 5)
         futures = [
             handle_regressions(project, gh, since=today)
             for project in projects
